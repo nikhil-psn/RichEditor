@@ -14,7 +14,6 @@ function EditPage(props) {
   const [post, setPost] = useState([]);
   const postId = props.match.params.postId;
   const [title, setTitle] = useState([]);
-  const [type, setType] = useState([]);
 
   useEffect(() => {
     const variable = { postId: postId };
@@ -24,7 +23,6 @@ function EditPage(props) {
         console.log("the fetched contents are : " + response.data.post.content);
         setPost(response.data.post);
         setTitle(response.data.post.title);
-        setType(response.data.post.type);
       } else {
         alert("Couldnt get post");
       }
@@ -44,17 +42,9 @@ function EditPage(props) {
       setFiles(files);
     };
 
-    const handleChangeTitle = (event) => {
+    const handleChange = (event) => {
       setTitle(event.target.value);
       console.log("title is :" + title);
-      // this.setState({
-      //   value: event.target.value,
-      // });
-    };
-
-    const handleChangeType = (event) => {
-      setType(event.target.value);
-      console.log("type is :" + type);
       // this.setState({
       //   value: event.target.value,
       // });
@@ -63,32 +53,17 @@ function EditPage(props) {
     const onSubmit = (event) => {
       event.preventDefault();
 
-      console.log("content getting saved is :" + content);
-
       setContent("");
 
       if (user.userData && !user.userData.isAuth) {
         return alert("Please Log in first");
       }
 
-      if (
-        !(
-          type == "Finance" ||
-          type == "News" ||
-          type == "Projects" ||
-          type == "Technology"
-        )
-      ) {
-        return alert(
-          "Type can only be Finance or News or Projects or Technology"
-        );
-      }
-
       const variables = {
         postId: postId,
-        content: content,
+        content: post.content,
         title: title,
-        type: type,
+        type: document.getElementById("type").value,
       };
 
       axios.patch("/api/blog/editPost", variables).then((response) => {
@@ -109,24 +84,23 @@ function EditPage(props) {
           <Title level={2}> Title</Title>
           <TextField
             value={title}
-            onChange={handleChangeTitle}
+            onChange={handleChange}
             type="text"
             id="title"
             name="title"
           />
           <Title level={2}> Type</Title>
-          <TextField
-            value={type}
-            onChange={handleChangeType}
-            type="text"
-            id="type"
-            name="type"
-          />
+          <select id="type">
+            <option value="Finance">Finance</option>
+            <option value="News">News</option>
+            <option value="Projects">Projects</option>
+            <option value="Technology">Technology</option>
+          </select>
           <Title level={2}> Body</Title>
         </div>
 
         <QuillEditor
-          placeholder={"The body of the blog goes here"}
+          placeholder={"Start Posting Something"}
           onEditorChange={onEditorChange}
           onFilesChange={onFilesChange}
           onFirstRender={onFirstRender}

@@ -55,19 +55,30 @@ function CreatePage(props) {
     <div style={{ maxWidth: "700px", margin: "2rem auto" }}>
       <div style={{ textAlign: "center" }}>
         <Title level={2}> Title</Title>
-        <TextField type="text" id="title" name="title" />
+        <TextField
+          type="text"
+          id="title"
+          name="title"
+          placeholder="Enter the blog's title here"
+        />
         {/* <input type="text" id="title" name="type" size="100"></input> */}
         <Title level={2}> Type</Title>
-        <select id="type">
+        <TextField
+          type="text"
+          id="type"
+          name="type"
+          placeholder="Enter the blog's type here"
+        />
+        {/* <select id="type">
           <option value="Finance">Finance</option>
           <option value="News">News</option>
           <option value="Projects">Projects</option>
           <option value="Technology">Technology</option>
-        </select>
+        </select> */}
         <Title level={2}> Body</Title>
       </div>
       <QuillEditor
-        placeholder={"Start Posting Something"}
+        placeholder={"The body of the blog goes here"}
         onEditorChange={onEditorChange}
         onFilesChange={onFilesChange}
         onFirstRender={onFirstRender}

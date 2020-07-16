@@ -77,36 +77,28 @@ router.post("/createPost", (req, res) => {
 });
 
 router.get("/getBlogs", (req, res) => {
-  Blog.find()
-    .populate("writer")
-    .exec((err, blogs) => {
-      if (err) return res.status(400).send(err);
-      res.status(200).json({ success: true, blogs });
-    });
+  Blog.find().exec((err, blogs) => {
+    if (err) return res.status(400).send(err);
+    res.status(200).json({ success: true, blogs });
+  });
 });
 router.get("/getFinanceBlogs", (req, res) => {
-  Blog.find({ type: "Finance" })
-    .populate("writer")
-    .exec((err, blogs) => {
-      if (err) return res.status(400).send(err);
-      res.status(200).json({ success: true, blogs });
-    });
+  Blog.find({ type: "Finance" }).exec((err, blogs) => {
+    if (err) return res.status(400).send(err);
+    res.status(200).json({ success: true, blogs });
+  });
 });
 router.get("/getNewsBlogs", (req, res) => {
-  Blog.find({ type: "News" })
-    .populate("writer")
-    .exec((err, blogs) => {
-      if (err) return res.status(400).send(err);
-      res.status(200).json({ success: true, blogs });
-    });
+  Blog.find({ type: "News" }).exec((err, blogs) => {
+    if (err) return res.status(400).send(err);
+    res.status(200).json({ success: true, blogs });
+  });
 });
 router.get("/getProjectsBlogs", (req, res) => {
-  Blog.find({ type: "Projects" })
-    .populate("writer")
-    .exec((err, blogs) => {
-      if (err) return res.status(400).send(err);
-      res.status(200).json({ success: true, blogs });
-    });
+  Blog.find({ type: "Projects" }).exec((err, blogs) => {
+    if (err) return res.status(400).send(err);
+    res.status(200).json({ success: true, blogs });
+  });
 });
 router.get("/getTechnologyBlogs", (req, res) => {
   Blog.find({ type: "Technology" })
