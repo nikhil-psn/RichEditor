@@ -26,29 +26,38 @@ function CreatePage(props) {
 
   const onSubmit = (event) => {
     event.preventDefault();
+    const type = document.getElementById("type").value;
     // console.log("The title is : " + document.getElementById("title").value);
     // console.log("The type is : " + document.getElementById("type").value);
-    setContent("");
     if (user.userData && !user.userData.isAuth) {
       return alert("Please Log in first");
+    } else if (
+      !(
+        type == "Finance" ||
+        type == "News" ||
+        type == "Projects" ||
+        type == "Technology"
+      )
+    ) {
+      alert("Type can only be Finance or News or Projects or Technology");
+    } else {
+      const variables = {
+        content: content,
+        userID: user.userData._id,
+        title: document.getElementById("title").value,
+        type: document.getElementById("type").value,
+      };
+
+      axios.post("/api/blog/createPost", variables).then((response) => {
+        if (response) {
+          message.success("Post Created Successfully!");
+          setContent("");
+          setTimeout(() => {
+            props.history.push("/blog");
+          }, 1000);
+        }
+      });
     }
-
-    const variables = {
-      content: content,
-      userID: user.userData._id,
-      title: document.getElementById("title").value,
-      type: document.getElementById("type").value,
-    };
-
-    axios.post("/api/blog/createPost", variables).then((response) => {
-      if (response) {
-        message.success("Post Created Successfully!");
-
-        setTimeout(() => {
-          props.history.push("/blog");
-        }, 1000);
-      }
-    });
   };
 
   return (

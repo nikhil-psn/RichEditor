@@ -65,13 +65,9 @@ function EditPage(props) {
 
       console.log("content getting saved is :" + content);
 
-      setContent("");
-
       if (user.userData && !user.userData.isAuth) {
         return alert("Please Log in first");
-      }
-
-      if (
+      } else if (
         !(
           type == "Finance" ||
           type == "News" ||
@@ -79,27 +75,25 @@ function EditPage(props) {
           type == "Technology"
         )
       ) {
-        return alert(
-          "Type can only be Finance or News or Projects or Technology"
-        );
+        alert("Type can only be Finance or News or Projects or Technology");
+      } else {
+        const variables = {
+          postId: postId,
+          content: content,
+          title: title,
+          type: type,
+        };
+
+        axios.patch("/api/blog/editPost", variables).then((response) => {
+          if (response) {
+            message.success("PostUpdated!");
+
+            setTimeout(() => {
+              props.history.push("/blog");
+            }, 2000);
+          }
+        });
       }
-
-      const variables = {
-        postId: postId,
-        content: content,
-        title: title,
-        type: type,
-      };
-
-      axios.patch("/api/blog/editPost", variables).then((response) => {
-        if (response) {
-          message.success("PostUpdated!");
-
-          setTimeout(() => {
-            props.history.push("/blog");
-          }, 2000);
-        }
-      });
     };
 
     // if (post.title == "Finance") {
