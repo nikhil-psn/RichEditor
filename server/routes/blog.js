@@ -53,9 +53,13 @@ router.post("/uploadfiles", (req, res) => {
 router.post("/createPost", (req, res) => {
   let blog = new Blog({
     content: req.body.content,
+    description: req.body.description,
     title: req.body.title,
-    writer: req.body.userID,
+    // writer: req.body.userID,
     type: req.body.type,
+    featureImage: req.body.featureImage,
+    claps: req.body.claps,
+    comments: req.body.comments,
   });
 
   blog.save((err, postInfo) => {
@@ -101,12 +105,10 @@ router.get("/getProjectsBlogs", (req, res) => {
   });
 });
 router.get("/getTechnologyBlogs", (req, res) => {
-  Blog.find({ type: "Technology" })
-    .populate("writer")
-    .exec((err, blogs) => {
-      if (err) return res.status(400).send(err);
-      res.status(200).json({ success: true, blogs });
-    });
+  Blog.find({ type: "Technology" }).exec((err, blogs) => {
+    if (err) return res.status(400).send(err);
+    res.status(200).json({ success: true, blogs });
+  });
 });
 
 router.delete("/deletePost/:id", (req, res) => {
@@ -137,10 +139,25 @@ router.patch("/editPost", (req, res) => {
   const title = req.body.title;
   const content = req.body.content;
   const type = req.body.type;
+  const claps = req.body.claps;
+  const comments = req.body.comments;
+  const description = req.body.description;
+  const featureImage = req.body.featureImage;
+
   console.log("the post being edited is " + req.body.postId);
   Blog.findOneAndUpdate(
     { _id: req.body.postId },
-    { $set: { title, content, type } },
+    {
+      $set: {
+        title,
+        content,
+        type,
+        claps,
+        comments,
+        description,
+        featureImage,
+      },
+    },
     { new: true }
   ).exec((err, post) => {
     if (err) {

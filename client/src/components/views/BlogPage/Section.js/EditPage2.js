@@ -15,16 +15,24 @@ function EditPage(props) {
   const postId = props.match.params.postId;
   const [title, setTitle] = useState([]);
   const [type, setType] = useState([]);
+  const [featureImage, setFeatureImage] = useState([]);
 
   useEffect(() => {
     const variable = { postId: postId };
+    if (title.toString.length < 1) {
+      console.log("title is null");
+    } else {
+      console.log("title is not null");
+    }
+    console.log("title is:" + title);
 
     axios.post("/api/blog/getPost", variable).then((response) => {
       if (response.data.success) {
-        console.log("the fetched contents are : " + response.data.post.content);
-        setPost(response.data.post);
         setTitle(response.data.post.title);
         setType(response.data.post.type);
+        setContent(response.data.post.content);
+        setFeatureImage(response.data.post.featureImage);
+        setPost(response.data.post);
       } else {
         alert("Couldnt get post");
       }
@@ -37,7 +45,6 @@ function EditPage(props) {
 
     const onEditorChange = (value) => {
       setContent(value);
-      // console.log(content)
     };
 
     const onFilesChange = (files) => {
@@ -47,23 +54,20 @@ function EditPage(props) {
     const handleChangeTitle = (event) => {
       setTitle(event.target.value);
       console.log("title is :" + title);
-      // this.setState({
-      //   value: event.target.value,
-      // });
     };
 
     const handleChangeType = (event) => {
       setType(event.target.value);
       console.log("type is :" + type);
-      // this.setState({
-      //   value: event.target.value,
-      // });
     };
 
     const onSubmit = (event) => {
       event.preventDefault();
 
       console.log("content getting saved is :" + content);
+      console.log("title getting saved is :" + title);
+      console.log("type getting saved is :" + type);
+      console.log("featureimage getting saved is :" + featureImage);
 
       if (user.userData && !user.userData.isAuth) {
         return alert("Please Log in first");
@@ -77,26 +81,74 @@ function EditPage(props) {
       ) {
         alert("Type can only be Finance or News or Projects or Technology");
       } else {
-        const variables = {
-          postId: postId,
-          content: content,
-          title: title,
-          type: type,
-        };
+        if (document.getElementById("blogimage").files[0] != null) {
+          let formData = new FormData();
+          const config = {
+            header: { "content-type": "multipart/form-data" },
+          };
+          formData.append(
+            "file",
+            document.getElementById("blogimage").files[0]
+          );
+          axios
+            .post("/api/blog/uploadfiles", formData, config)
+            .then((response) => {
+              if (response.data.success) {
+                console.log(
+                  "uploaded successfully :: " +
+                    "http://localhost:5000/" +
+                    response.data.url
+                );
+                setFeatureImage("http://localhost:5000/" + response.data.url);
 
-        axios.patch("/api/blog/editPost", variables).then((response) => {
-          if (response) {
-            message.success("PostUpdated!");
+                const variables = {
+                  postId: postId,
+                  content: content,
+                  description: content.substring(0, 30).toString() + "...",
+                  title: title,
+                  type: type,
+                  featureImage: "http://localhost:5000/" + response.data.url,
+                  claps: post.claps,
+                  comments: post.comments,
+                };
+                axios
+                  .patch("/api/blog/editPost", variables)
+                  .then((response) => {
+                    if (response) {
+                      message.success("PostUpdated!");
 
-            setTimeout(() => {
-              props.history.push("/blog");
-            }, 2000);
-          }
-        });
+                      setTimeout(() => {
+                        props.history.push("/blog");
+                      }, 500);
+                    }
+                  });
+              }
+            });
+        } else {
+          console.log("the feature image is not changed : " + featureImage);
+          const variables = {
+            postId: postId,
+            content: content,
+            description: content.substring(0, 30).toString() + "...",
+            title: title,
+            type: type,
+            featureImage: featureImage,
+            claps: post.claps,
+            comments: post.comments,
+          };
+          axios.patch("/api/blog/editPost", variables).then((response) => {
+            if (response) {
+              message.success("PostUpdated!");
+
+              setTimeout(() => {
+                props.history.push("/blog");
+              }, 500);
+            }
+          });
+        }
       }
     };
 
-    // if (post.title == "Finance") {
     return (
       <div style={{ maxWidth: "700px", margin: "2rem auto" }}>
         <div style={{ textAlign: "center" }}>
@@ -128,6 +180,10 @@ function EditPage(props) {
 
         <Form onSubmit={onSubmit}>
           <div style={{ textAlign: "center", margin: "2rem" }}>
+            <Title level={2}> Feature Image</Title>
+            <input type="file" name="blogimage" id="blogimage" />
+            <img src={featureImage} alt="No feature image found"></img>
+            <br />
             <Button
               size="large"
               htmlType="submit"
@@ -140,142 +196,6 @@ function EditPage(props) {
         </Form>
       </div>
     );
-    // } else if (post.title == "News") {
-    //   return (
-    //     <div style={{ maxWidth: "700px", margin: "2rem auto" }}>
-    //       <div style={{ textAlign: "center" }}>
-    //         <Title level={2}> Title</Title>
-    //         <TextField
-    //           value={title}
-    //           onChange={handleChange}
-    //           type="text"
-    //           id="title"
-    //           name="title"
-    //         />
-    //         <Title level={2}> Type</Title>
-    //         <select id="type">
-    //           <option value="Finance">Finance</option>
-    //           <option value="News" selected>
-    //             News
-    //           </option>
-    //           <option value="Projects">Projects</option>
-    //           <option value="Technology">Technology</option>
-    //         </select>
-    //         <Title level={2}> Body</Title>
-    //       </div>
-
-    //       <QuillEditor
-    //         placeholder={"Start Posting Something"}
-    //         onEditorChange={onEditorChange}
-    //         onFilesChange={onFilesChange}
-    //         onFirstRender={onFirstRender}
-    //       />
-
-    //       <Form onSubmit={onSubmit}>
-    //         <div style={{ textAlign: "center", margin: "2rem" }}>
-    //           <Button
-    //             size="large"
-    //             htmlType="submit"
-    //             className=""
-    //             onSubmit={onSubmit}
-    //           >
-    //             Submit
-    //           </Button>
-    //         </div>
-    //       </Form>
-    //     </div>
-    //   );
-    // } else if (post.title == "Projects") {
-    //   return (
-    //     <div style={{ maxWidth: "700px", margin: "2rem auto" }}>
-    //       <div style={{ textAlign: "center" }}>
-    //         <Title level={2}> Title</Title>
-    //         <TextField
-    //           value={title}
-    //           onChange={handleChange}
-    //           type="text"
-    //           id="title"
-    //           name="title"
-    //         />
-    //         <Title level={2}> Type</Title>
-    //         <select id="type">
-    //           <option value="Finance">Finance</option>
-    //           <option value="News">News</option>
-    //           <option value="Projects" selected>
-    //             Projects
-    //           </option>
-    //           <option value="Technology">Technology</option>
-    //         </select>
-    //         <Title level={2}> Body</Title>
-    //       </div>
-
-    //       <QuillEditor
-    //         placeholder={"Start Posting Something"}
-    //         onEditorChange={onEditorChange}
-    //         onFilesChange={onFilesChange}
-    //         onFirstRender={onFirstRender}
-    //       />
-
-    //       <Form onSubmit={onSubmit}>
-    //         <div style={{ textAlign: "center", margin: "2rem" }}>
-    //           <Button
-    //             size="large"
-    //             htmlType="submit"
-    //             className=""
-    //             onSubmit={onSubmit}
-    //           >
-    //             Submit
-    //           </Button>
-    //         </div>
-    //       </Form>
-    //     </div>
-    //   );
-    // } else if (post.title == "Projects") {
-    //   return (
-    //     <div style={{ maxWidth: "700px", margin: "2rem auto" }}>
-    //       <div style={{ textAlign: "center" }}>
-    //         <Title level={2}> Title</Title>
-    //         <TextField
-    //           value={title}
-    //           onChange={handleChange}
-    //           type="text"
-    //           id="title"
-    //           name="title"
-    //         />
-    //         <Title level={2}> Type</Title>
-    //         <select id="type">
-    //           <option value="Finance">Finance</option>
-    //           <option value="News">News</option>
-    //           <option value="Projects">Projects</option>
-    //           <option value="Technology" selected>
-    //             Technology
-    //           </option>
-    //         </select>
-    //         <Title level={2}> Body</Title>
-    //       </div>
-
-    //       <QuillEditor
-    //         placeholder={"Start Posting Something"}
-    //         onEditorChange={onEditorChange}
-    //         onFilesChange={onFilesChange}
-    //         onFirstRender={onFirstRender}
-    //       />
-
-    //       <Form onSubmit={onSubmit}>
-    //         <div style={{ textAlign: "center", margin: "2rem" }}>
-    //           <Button
-    //             size="large"
-    //             htmlType="submit"
-    //             className=""
-    //             onSubmit={onSubmit}
-    //           >
-    //             Submit
-    //           </Button>
-    //         </div>
-    //       </Form>
-    //     </div>
-    //   );
-    // }
   } else {
     return <div style={{ width: "80%", margin: "3rem auto" }}>loading...</div>;
   }

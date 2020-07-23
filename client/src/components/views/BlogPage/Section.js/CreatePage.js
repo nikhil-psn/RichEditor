@@ -25,10 +25,9 @@ function CreatePage(props) {
   };
 
   const onSubmit = (event) => {
+    console.log("the event is : " + event);
     event.preventDefault();
     const type = document.getElementById("type").value;
-    // console.log("The title is : " + document.getElementById("title").value);
-    // console.log("The type is : " + document.getElementById("type").value);
     if (user.userData && !user.userData.isAuth) {
       return alert("Please Log in first");
     } else if (
@@ -40,21 +39,45 @@ function CreatePage(props) {
       )
     ) {
       alert("Type can only be Finance or News or Projects or Technology");
+    } else if (document.getElementById("blogimage").files[0] == null) {
+      return alert("Please add a feature image");
     } else {
-      const variables = {
-        content: content,
-        userID: user.userData._id,
-        title: document.getElementById("title").value,
-        type: document.getElementById("type").value,
+      let formData = new FormData();
+      const config = {
+        header: { "content-type": "multipart/form-data" },
       };
-
-      axios.post("/api/blog/createPost", variables).then((response) => {
-        if (response) {
-          message.success("Post Created Successfully!");
-          setContent("");
-          setTimeout(() => {
-            props.history.push("/blog");
-          }, 1000);
+      var featureImage;
+      formData.append("file", document.getElementById("blogimage").files[0]);
+      axios.post("/api/blog/uploadfiles", formData, config).then((response) => {
+        if (response.data.success) {
+          console.log("uploaded successfully");
+          featureImage = "http://localhost:5000/" + response.data.url;
+          console.log("feature image is : " + featureImage);
+          console.log("feature image sending is : " + featureImage);
+          const variables = {
+            content: content,
+            // userID: user.userData._id,
+            title: document.getElementById("title").value,
+            description: content.substring(0, 30).toString() + "...",
+            type: document.getElementById("type").value,
+            featureImage: featureImage,
+            claps: 0,
+            comments: [],
+          };
+          console.log("the variables are : ");
+          console.log(variables);
+          axios.post("/api/blog/createPost", variables).then((response) => {
+            if (response) {
+              console.log("feature image added is : " + variables.featureImage);
+              message.success("Post Created Successfully!");
+              setContent("");
+              setTimeout(() => {
+                props.history.push("/blog");
+              }, 500);
+            }
+          });
+        } else {
+          console.log("upload failed");
         }
       });
     }
@@ -70,7 +93,6 @@ function CreatePage(props) {
           name="title"
           placeholder="Enter the blog's title here"
         />
-        {/* <input type="text" id="title" name="type" size="100"></input> */}
         <Title level={2}> Type</Title>
         <TextField
           type="text"
@@ -78,12 +100,6 @@ function CreatePage(props) {
           name="type"
           placeholder="Enter the blog's type here"
         />
-        {/* <select id="type">
-          <option value="Finance">Finance</option>
-          <option value="News">News</option>
-          <option value="Projects">Projects</option>
-          <option value="Technology">Technology</option>
-        </select> */}
         <Title level={2}> Body</Title>
       </div>
       <QuillEditor
@@ -92,9 +108,10 @@ function CreatePage(props) {
         onFilesChange={onFilesChange}
         onFirstRender={onFirstRender}
       />
-
       <Form onSubmit={onSubmit}>
         <div style={{ textAlign: "center", margin: "2rem" }}>
+          <Title level={2}> Feature Image</Title>
+          <input type="file" name="blogimage" id="blogimage" />
           <Button
             size="large"
             htmlType="submit"

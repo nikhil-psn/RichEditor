@@ -50,7 +50,10 @@ function TechnologyPage() {
             </a>,
           ]}
         >
-          <Meta title={blog.title} />
+          <Meta
+            title={blog.title}
+            avatar={<Avatar shape="square" src={blog.featureImage} size={50} />}
+          />
           <div style={{ height: 150, overflowY: "scroll", marginTop: 10 }}>
             <div dangerouslySetInnerHTML={{ __html: blog.content }} />
           </div>

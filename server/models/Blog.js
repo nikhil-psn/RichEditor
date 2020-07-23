@@ -5,10 +5,15 @@ const blogSchema = mongoose.Schema(
   {
     content: {
       type: String,
+      required: true,
     },
     title: {
       type: String,
-      //   required: true
+      required: true,
+    },
+    description: {
+      type: String,
+      required: true,
     },
     // writer: {
     //   type: Schema.Types.ObjectId,
@@ -16,8 +21,25 @@ const blogSchema = mongoose.Schema(
     // },
     type: {
       type: String,
-      // required:true
+      required: true,
     },
+    featureImage: {
+      type: String,
+      required: true,
+    },
+    claps: {
+      type: Number,
+      required: true,
+    },
+    comments: [
+      {
+        author: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+        text: String,
+      },
+    ],
   },
   { timestamps: true }
 );

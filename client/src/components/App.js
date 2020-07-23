@@ -51,7 +51,7 @@ function App() {
           <Route
             exact
             path="/blog/delete/:postId"
-            component={Auth(DeleteBlogPage, null)}
+            component={Auth(DeleteBlogPage, true)}
           />
           <Route
             exact

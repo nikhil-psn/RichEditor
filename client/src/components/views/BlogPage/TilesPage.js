@@ -83,7 +83,7 @@ function TilesPage(props) {
       <div style={{ margin: "10px" }}>
         <StyleRoot>
           <div className="test" style={styles.bounce}>
-            <h1>This is an animation</h1>
+            <h1>Types of blogs</h1>
           </div>
         </StyleRoot>
         <GridList

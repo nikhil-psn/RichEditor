@@ -10,7 +10,6 @@ function deletePost() {
     if (response.data.success) {
       console.log(response.data.blogs);
       alert("Deleted this blog");
-      //   setBlogs(response.data.blogs);
     } else {
       alert("Couldn't delete this blog");
     }
@@ -50,7 +49,10 @@ function BlogPage() {
             </a>,
           ]}
         >
-          <Meta title={blog.title} />
+          <Meta
+            title={blog.title}
+            avatar={<Avatar shape="square" src={blog.featureImage} size={50} />}
+          />
           <div style={{ height: 150, overflowY: "scroll", marginTop: 10 }}>
             <div dangerouslySetInnerHTML={{ __html: blog.content }} />
           </div>
@@ -61,7 +63,7 @@ function BlogPage() {
 
   return (
     <div style={{ width: "85%", margin: "3rem auto" }}>
-      <Title level={2}> Blog Lists </Title>
+      <Title level={2}> Blogs List </Title>
       <Row gutter={[32, 16]}>{renderCards}</Row>
     </div>
   );
